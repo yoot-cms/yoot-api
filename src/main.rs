@@ -1,4 +1,5 @@
 #[macro_use] extern crate rocket;
+
 mod utils;
 mod services;
 mod routes;

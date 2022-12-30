@@ -1,12 +1,13 @@
 use crate::services;
+use rocket::serde::json::{Value, Json};
+use crate::models::user::User;
 
-
-#[get("/register")]
-pub fn register() -> &'static str {
-    services::user::register()
+#[post("/register", format="json", data="<user>")]
+pub fn register( user: Option<Json<User>> ) -> Value {
+    services::user::register(user)
 }
 
-#[get("/login")]
-pub fn login() -> &'static str {
-    services::user::login()
+#[post("/login", format="json", data="<user>")]
+pub fn login( user: Option<Json<User>> ) -> Value {
+    services::user::login(user)
 }
