@@ -1,8 +1,19 @@
 use crate::models::user::User;
 use rocket::serde::json::{ Json, Value, serde_json::json }; 
+use rocket::State;
+use mongodb::Database;
 
 
-pub fn register( user_data: Option<Json<User>> ) -> Value {
+pub async fn register(  db: &State<Database>, user_data: Option<Json<User>> ) -> Value {
+    let test = db.list_collection_names(None).await;
+    match test {
+        Ok(value)=>{
+            println!("{}", value[0])
+        },
+        Err(_)=>{
+            print!("Shit")
+        }
+    }
     match user_data {
         Some(user)=>{
             let new_user = User{
@@ -21,7 +32,7 @@ pub fn register( user_data: Option<Json<User>> ) -> Value {
     
 }
 
-pub fn login( user_data: Option<Json<User>> ) -> Value {
+pub async fn login( user_data: Option<Json<User>> ) -> Value {
     match user_data {
         Some(user)=>{
             let new_user = User{

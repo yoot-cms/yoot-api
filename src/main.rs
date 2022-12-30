@@ -4,12 +4,13 @@ mod utils;
 mod services;
 mod routes;
 mod models;
-pub mod db;
+mod db;
 
 use routes::user::{login, register};
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
+        .attach(db::init())
         .mount("/auth", routes![register, login])
 }
