@@ -4,6 +4,7 @@ mod utils;
 mod services;
 mod routes;
 mod models;
+pub mod db;
 
 use routes::user::{login, register};
 
