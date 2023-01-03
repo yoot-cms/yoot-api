@@ -8,9 +8,10 @@ pub async fn register(  db: &State<Database>, user_data: Option<Json<User>> ) ->
     let test = db.list_collection_names(None).await;
     match test {
         Ok(value)=>{
-            println!("{}", value[0])
+            println!("{:?}", value)
         },
-        Err(_)=>{
+        Err(err)=>{
+            println!("{}", err);
             print!("Shit")
         }
     }
