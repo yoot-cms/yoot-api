@@ -1,11 +1,6 @@
 use rocket::serde::{Serialize, Deserialize};
-use rocket::serde::json::Value;
 use jsonwebtoken::{ Header, encode, EncodingKey };
 
-#[derive(Serialize)]
-pub struct CustomResponse{
-    pub data: Value
-}
 
 #[derive(Serialize, Deserialize)]
 pub struct Claims{

@@ -32,7 +32,7 @@ pub async fn establish_connection() -> mongodb::error::Result<Database> {
     // let mongo_uri = "mongodb://mongo:5206QBEhvK4biGt6xlKb@containers-us-west-170.railway.app:5735/?retryWrites=true&w=majority&authSource=admin";
     let client_options = ClientOptions::parse(db_url).await?;
     let mongo_client = Client::with_options(client_options)?;
-    let database = mongo_client.database("test");
+    let database = mongo_client.database("pigeoncms");
     println!("Connected to db successfully");
     Ok(database)
 }
