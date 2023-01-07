@@ -1,7 +1,7 @@
 use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
 use rocket::fairing::AdHoc;
-use std::env;
+// use std::env;
 
 
 pub fn init() -> AdHoc{
