@@ -2,7 +2,6 @@ use crate::models::user::User;
 use crate::utils::{generate_auth_token, hash_password, verify_password};
 use crate::models::user;
 use mongodb::bson::doc;
-use rocket::futures::TryFutureExt;
 use rocket::serde::json::{ Json, Value, serde_json::json };
 use rocket::State;
 use mongodb::{Database, Collection};
