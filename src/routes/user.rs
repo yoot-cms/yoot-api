@@ -11,6 +11,6 @@ pub async fn register( db: &State<Database> ,user: Option<Json<User>> ) -> Value
 }
 
 #[post("/login", format="json", data="<user>")]
-pub async fn login( user: Option<Json<User>> ) -> Value {
-    user::login(user).await
+pub async fn login( db: &State<Database>, user: Option<Json<User>> ) -> Value {
+    user::login( &db, user).await
 }
