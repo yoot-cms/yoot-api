@@ -1,5 +1,5 @@
 #[macro_use] extern crate rocket;
-extern  crate bcrypt;
+extern crate bcrypt;
 
 mod utils;
 mod services;

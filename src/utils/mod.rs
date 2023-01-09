@@ -1,6 +1,6 @@
 use rocket::serde::{Serialize, Deserialize};
 use jsonwebtoken::{ Header, encode, EncodingKey };
-use bcrypt::{ DEFAULT_COST, hash, verify };
+use bcrypt::{ hash_with_salt };
 
 #[derive(Serialize, Deserialize)]
 pub struct Claims{
@@ -25,12 +25,7 @@ pub fn generate_auth_token( email: &str ) -> Option<String> {
     }
 }
 
-pub fn hash_password( plain_test_password: &str ) -> Option<String>{
-    let hashed = hash(plain_test_password, DEFAULT_COST).unwrap();
-    Some(hashed)
-}
+pub fn hash_password( plain_text_password: &str ) -> Option<String>{
+    let hashed = hash_with_salt( plain_text_password, 4, "saltyspringbrehe".as_bytes() );
 
-pub fn verify_password( plain_test_password: &str, hashed_password: &str ) -> Option<bool> {
-    let password_is_correct = verify(plain_test_password, hashed_password).unwrap();
-    Some(password_is_correct)
 }

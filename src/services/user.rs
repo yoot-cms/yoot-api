@@ -1,11 +1,10 @@
 use crate::models::user::User;
-use crate::utils::{generate_auth_token, hash_password, verify_password};
+use crate::utils::{generate_auth_token};
 use crate::models::user;
 use mongodb::bson::doc;
 use rocket::serde::json::{ Json, Value, serde_json::json };
 use rocket::State;
 use mongodb::{Database, Collection};
-
 
 pub async fn register(  db: &State<Database>, user_data: Option<Json<User>> ) -> Value {
     let users_collection : Collection<user::User> = db.collection("users");
@@ -25,8 +24,8 @@ pub async fn register(  db: &State<Database>, user_data: Option<Json<User>> ) ->
                 None=>{}
             }
             //If email does not exists in database, hash password
-            let hashed_password = hash_password(&user.email);
-            match hashed_password {
+            let hashed_password = bcrypt::hash(user.email.to_string()).unwrap();
+            match Some(hashed_password) {
                 //If password hashins succeeds
                 Some(value)=>{
                     //Create a new User with the hashed password
@@ -88,41 +87,28 @@ pub async fn login( db: &State<Database>, user_data: Option<Json<User>> ) -> Val
     match user_data {
         //Deserialize 
         Some(user)=>{
-            let _new_user = User{
-                email: user.email.to_string(),
-                password: user.password.to_string()
-            };
             let filter = doc! { "email": &user.email };
             let targetted_user = users_collection.find_one(filter, None).await.unwrap();
             match targetted_user {
                 Some(found_user)=>{
-                    let password_is_correct = verify_password(&user.password, &found_user.password);
-                    match password_is_correct {
-                        Some(v)=>{
-                            if !v{
-                                return json!({
-                                    "status":400
-                                })    
-                            }
-                            let auth_token = generate_auth_token(&found_user.email);
-                            match auth_token {
-                                Some(token)=>{
-                                    return json!({
-                                        "status":200,
-                                        "token": token
-                                    })
-                                },
-                                None=>{
-                                    return json!({
-                                        "status":500
-                                    })        
-                                }
-                            }
+                    let password_is_correct = bcrypt::verify(&user.password, &found_user.password);
+                    if !password_is_correct{
+                        return json!({
+                            "status":400
+                        })    
+                    }
+                    let auth_token = generate_auth_token(&found_user.email);
+                    match auth_token {
+                        Some(token)=>{
+                            return json!({
+                                "status":200,
+                                "token": token
+                            })
                         },
                         None=>{
                             return json!({
                                 "status":500
-                            })
+                            })        
                         }
                     }
                 },
