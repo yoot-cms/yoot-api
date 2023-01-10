@@ -6,7 +6,6 @@ use rocket::serde::json::{ Json, Value, serde_json::json };
 use rocket::State;
 use mongodb::{Database, Collection};
 
-
 pub async fn register(  db: &State<Database>, user_data: Option<Json<User>> ) -> Value {
     let users_collection : Collection<user::User> = db.collection("users");
     match user_data {
@@ -16,8 +15,7 @@ pub async fn register(  db: &State<Database>, user_data: Option<Json<User>> ) ->
             let filter = doc! { "email": &user.email };
             let potential_duplicate = users_collection.find_one(filter, None).await.unwrap();
             match potential_duplicate {
-                Some(user)=>{
-                    print!("{}", user.email);
+                Some(_)=>{
                     return json!({
                         "status":409
                     })
@@ -25,9 +23,9 @@ pub async fn register(  db: &State<Database>, user_data: Option<Json<User>> ) ->
                 None=>{}
             }
             //If email does not exists in database, hash password
-            let hashed_password = hash_password(&user.email);
+            let hashed_password = hash_password(&user.password);
             match hashed_password {
-                //If password hashins succeeds
+                //If password hashing succeeds
                 Some(value)=>{
                     //Create a new User with the hashed password
                     let new_user = User{
@@ -88,21 +86,17 @@ pub async fn login( db: &State<Database>, user_data: Option<Json<User>> ) -> Val
     match user_data {
         //Deserialize 
         Some(user)=>{
-            let _new_user = User{
-                email: user.email.to_string(),
-                password: user.password.to_string()
-            };
             let filter = doc! { "email": &user.email };
             let targetted_user = users_collection.find_one(filter, None).await.unwrap();
             match targetted_user {
                 Some(found_user)=>{
                     let password_is_correct = verify_password(&user.password, &found_user.password);
                     match password_is_correct {
-                        Some(v)=>{
-                            if !v{
+                        Some(verification_result)=>{
+                            if !verification_result{
                                 return json!({
                                     "status":400
-                                })    
+                                })
                             }
                             let auth_token = generate_auth_token(&found_user.email);
                             match auth_token {
