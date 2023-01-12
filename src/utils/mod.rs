@@ -1,5 +1,5 @@
 use rocket::serde::{Serialize, Deserialize};
-use jsonwebtoken::{ Header, encode, EncodingKey };
+use jsonwebtoken::{ Header, encode, EncodingKey, decode, DecodingKey, Validation };
 use bcrypt::{ hash_with_salt };
 
 
@@ -11,7 +11,7 @@ pub struct Claims{
 
 pub fn generate_auth_token( email: &str ) -> Option<String> {
     let new_token = Claims{
-        exp:100000,
+        exp:4000000000,
         email:String::from(email)
     };
     let token = encode(&Header::default(), &new_token, &EncodingKey::from_secret("secret".as_ref()));
@@ -19,11 +19,24 @@ pub fn generate_auth_token( email: &str ) -> Option<String> {
         Ok(value)=>{
             Some(value)
         },
-        Err(error)=>{
-            println!("{}", error);
+        Err(_)=>{
             Some("Something went wrong".to_string())
         }
     }
+}
+
+pub fn verify_and_decode_token( bearer_token: &str ) -> Option<String>{
+    let token: Vec<&str> = bearer_token.split(" ").collect();
+    let decoded_token = decode::<Claims>(&token[1], &DecodingKey::from_secret("secret".as_ref()), &Validation::default());
+    match decoded_token {
+        Ok(token)=>{
+            Some(token.claims.email)
+        },
+        Err(_)=>{
+            Some("".to_string())
+        }
+    }
+    
 }
 
 pub fn hash_password( plain_text_password: &str ) -> Option<String> {
