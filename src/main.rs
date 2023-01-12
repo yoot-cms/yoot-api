@@ -8,10 +8,12 @@ mod models;
 mod db;
 
 use routes::user::{login, register};
+use routes::containers::{create, get_all};
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
         .attach(db::init())
         .mount("/auth", routes![register, login])
+        .mount("/container", routes![create, get_all])
 }
