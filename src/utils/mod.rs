@@ -27,7 +27,6 @@ pub fn generate_auth_token( email: &str ) -> Option<String> {
 
 pub fn verify_and_decode_token( bearer_token: &str ) -> Option<String>{
     let token: Vec<&str> = bearer_token.split(" ").collect();
-    println!("{}", &token[1]);
     let decoded_token = decode::<Claims>(&token[1], &DecodingKey::from_secret("secret".as_ref()), &Validation::default());
     match decoded_token {
         Ok(token)=>{
