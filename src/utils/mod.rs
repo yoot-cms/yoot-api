@@ -9,6 +9,12 @@ pub struct Claims{
     email: String
 }
 
+
+#[derive(Serialize, Deserialize)]
+pub struct ContainerCreationRequest{
+    pub name: String
+}
+
 pub fn generate_auth_token( email: &str ) -> Option<String> {
     let new_token = Claims{
         exp:4000000000,
