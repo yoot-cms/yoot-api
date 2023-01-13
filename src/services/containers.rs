@@ -7,6 +7,7 @@ use rocket::State;
 use mongodb::bson::{doc, Document};
 use chrono::Local;
 use crate::utils::ContainerCreationRequest;
+use mongodb::bson::oid::ObjectId;
 
 
 pub async fn create_container( db: &State<Database>, container: Option<Json<ContainerCreationRequest>>, user: String ) -> Value {
@@ -25,7 +26,8 @@ pub async fn create_container( db: &State<Database>, container: Option<Json<Cont
                     let new_container: Container = Container{
                         name: container.name.to_string(),
                         owner: user.to_string(),
-                        created_at: Local::now().date_naive().format("%Y-%m-%d").to_string()
+                        created_at: Local::now().date_naive().format("%Y-%m-%d").to_string(),
+                        _id : ObjectId::new().to_string()
                     };
                     let insertion_result = containers_collection.insert_one(new_container, None).await;
                     match insertion_result {
