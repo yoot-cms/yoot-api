@@ -1,11 +1,12 @@
-use crate::models::{container::Container, auth_token::AuthToken};
+use crate::models::auth_token::AuthToken;
 use rocket::State;
-use rocket::serde::json::{Json, Value};
+use rocket::serde::json::{ Json, Value};
 use mongodb::Database;
 use crate::services::containers::{ create_container, get_all_containers };
+use crate::utils::ContainerCreationRequest;
 
 #[post("/create", format="json", data="<container>")]
-pub async fn create( auth_token: AuthToken, db: &State<Database>, container: Option<Json<Container>> ) -> Value {
+pub async fn create( auth_token: AuthToken, db: &State<Database>, container: Option<Json<ContainerCreationRequest>> ) -> Value {
     create_container(&db, container, auth_token.0.to_string()).await
 }
 
