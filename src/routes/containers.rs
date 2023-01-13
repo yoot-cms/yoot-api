@@ -2,7 +2,7 @@ use crate::models::auth_token::AuthToken;
 use rocket::State;
 use rocket::serde::json::{ Json, Value};
 use mongodb::Database;
-use crate::services::containers::{ create_container, get_all_containers };
+use crate::services::containers::{ create_container, get_all_containers, get_one_container };
 use crate::utils::ContainerCreationRequest;
 
 #[post("/create", format="json", data="<container>")]
@@ -13,4 +13,9 @@ pub async fn create( auth_token: AuthToken, db: &State<Database>, container: Opt
 #[get("/get_all")]
 pub async fn get_all( auth_token: AuthToken, db: &State<Database> ) -> Value{
     get_all_containers(db, auth_token.0).await
+}
+
+#[get("/get/<container_name>")]
+pub async fn get_one( auth_token: AuthToken, db: &State<Database>, container_name: String ) -> Value{
+    get_one_container(db, container_name).await
 }

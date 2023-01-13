@@ -1,4 +1,4 @@
-use mongodb::Database;
+use mongodb::{ Database, bson::oid::ObjectId };
 use rocket::futures::StreamExt;
 use rocket::serde::json::Json;
 use crate::models::container::Container;
@@ -7,7 +7,6 @@ use rocket::State;
 use mongodb::bson::{doc, Document};
 use chrono::Local;
 use crate::utils::ContainerCreationRequest;
-use mongodb::bson::oid::ObjectId;
 
 
 pub async fn create_container( db: &State<Database>, container: Option<Json<ContainerCreationRequest>>, user: String ) -> Value {
@@ -54,6 +53,7 @@ pub async fn create_container( db: &State<Database>, container: Option<Json<Cont
     }
 }
 
+//TODO - Return the number of entities and ressources in the containers
 pub async fn get_all_containers( db: &State<Database>, user: String ) -> Value {
     let filter = doc! {"owner":&user};
     let containers_collection = db.collection("containers");
@@ -71,4 +71,33 @@ pub async fn get_all_containers( db: &State<Database>, user: String ) -> Value {
         "status":200,
         "data":containers
     })
+}
+
+pub async fn get_one_container( db: &State<Database>, container_name: String ) -> Value{
+    let containers_collection = db.collection::<Container>("containers");
+    let filter = doc! {"name": container_name.to_string()};
+    let targetted_container = containers_collection.find_one(filter, None).await;
+    match targetted_container {
+        Ok(value)=>{
+            match value {
+                Some(container_data)=>{
+                    json!({
+                        "status":200,
+                        "data": container_data
+                    })
+                },
+                None=>{
+                    json!({
+                        "status":404
+                    })
+                }
+            }
+        },
+        Err(_)=>{
+            json!({
+                "status":"500"
+            })
+        }
+        
+    }
 }
