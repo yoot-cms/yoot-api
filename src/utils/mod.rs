@@ -1,6 +1,6 @@
 use rocket::serde::{Serialize, Deserialize};
 use jsonwebtoken::{ Header, encode, EncodingKey, decode, DecodingKey, Validation };
-use bcrypt::{ hash_with_salt };
+use bcrypt::hash_with_salt;
 
 
 #[derive(Serialize, Deserialize)]
