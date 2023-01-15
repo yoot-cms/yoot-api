@@ -101,3 +101,41 @@ pub async fn get_one_container( db: &State<Database>, container_name: String ) -
         
     }
 }
+
+pub async fn delete_container( db: &State<Database>, container_name: String, user: String ) -> Value{
+    let containers_collection = db.collection::<Container>("containers");
+    let filter = doc! { "owner":user.to_string(), "name":container_name.to_string() };
+    let targetted_container = containers_collection.find_one(filter, None).await;
+    match targetted_container {
+        Ok(container)=>{
+            match container {
+                Some(_)=>{
+                    let filter = doc! { "owner":user.to_string(), "name":container_name.to_string() };
+                    let deletion_result = containers_collection.delete_one(filter, None).await;
+                    match deletion_result {
+                        Ok(_)=>{
+                            json!({
+                                "status":200
+                            })
+                        },
+                        Err(_)=>{
+                            json!({
+                                "status":500
+                            })
+                        }
+                    }
+                },
+                None=>{
+                    json!({
+                        "status":404
+                    })
+                }
+            }
+        },
+        Err(_)=>{
+            json!({
+                "status":500
+            })
+        }
+    }
+}
