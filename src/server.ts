@@ -1,3 +1,4 @@
+import { Request, Response } from "express"
 import express from "express"
 import cors from "cors"
 import * as dotenv from "dotenv"
@@ -9,6 +10,9 @@ app.use(express.json())
 
 const PORT = process.env.PORT || 5000
 
+app.get("/", ( req: Request, res: Response )=>{
+    return res.status(200).send("Hello")
+})
 
 app.listen(PORT, async() => {
     const db_version = await sql` select version() `;
