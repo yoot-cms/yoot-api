@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import express from "express"
 import cors from "cors"
 import * as dotenv from "dotenv"
+import { verify_api_key } from "./utils";
 dotenv.config()
 import sql from "./db"
 const app = express()
