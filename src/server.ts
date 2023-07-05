@@ -4,27 +4,29 @@ import cors from "cors"
 import * as dotenv from "dotenv"
 dotenv.config()
 import sql from "./db"
+import { authenticate_request } from "./middlewares/Auth"
+import type { ApiKey } from "./utils"
 const app = express()
 app.use(cors())
 app.use(express.json())
 
 const PORT = process.env.PORT || 5000
 
-app.get("/", (_req: Request, res: Response)=>{
+app.get("/", authenticate_request, (req: Request<{}, {}, { key:ApiKey }>, res: Response) => {
+    console.log(req.body.key)
     return res.status(200).send("Hello from YOOT API")
 })
 
-app.get("/health", async (_req: Request, res: Response)=>{
+app.get("/health", async (_req: Request, res: Response) => {
     try {
         const db_version = await sql` select version() `
         return res.status(200).send(db_version)
     } catch (err) {
         return res.status(500).send(err)
     }
-
 })
 
-app.listen(PORT, async() => {
+app.listen(PORT, async () => {
     const db_version = await sql` select version() `;
     console.log(db_version)
     console.log(`App listening on port ${PORT}`)
