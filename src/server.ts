@@ -4,18 +4,14 @@ import cors from "cors"
 import * as dotenv from "dotenv"
 dotenv.config()
 import sql from "./db"
-import { authenticate_request } from "./middlewares/Auth"
-import type { ApiKey } from "./utils"
+import entities_router from "./routes/entities"
 const app = express()
 app.use(cors())
 app.use(express.json())
 
 const PORT = process.env.PORT || 5000
 
-app.get("/", authenticate_request, (req: Request<{}, {}, { key:ApiKey }>, res: Response) => {
-    console.log(req.body.key)
-    return res.status(200).send("Hello from YOOT API")
-})
+app.use(entities_router)
 
 app.get("/health", async (_req: Request, res: Response) => {
     try {
