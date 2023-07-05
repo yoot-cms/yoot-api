@@ -18,7 +18,6 @@ export async function get_entities(req: Request<{}, {}, { key: ApiKey }>, res: R
 export async function delete_entity( req: Request<{ name: string }, {}, { key: ApiKey }>, res: Response ){
     try {
         const { name } = req.params
-        console.log(name)
         return res.status(200).send()
     } catch (err) {
         console.log(`Error in delete entity`)
