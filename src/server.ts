@@ -14,6 +14,16 @@ app.get("/", (_req: Request, res: Response)=>{
     return res.status(200).send("Hello from YOOT API")
 })
 
+app.get("/health", async (_req: Request, res: Response)=>{
+    try {
+        const db_version = await sql` select version() `
+        return res.status(200).send(db_version)
+    } catch (err) {
+        return res.status(500).send(err)
+    }
+
+})
+
 app.listen(PORT, async() => {
     const db_version = await sql` select version() `;
     console.log(db_version)
