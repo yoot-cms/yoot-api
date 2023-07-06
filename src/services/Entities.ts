@@ -43,6 +43,9 @@ export async function create_entity( req: Request<{}, {}, { name:string, schema:
         })
     } catch (err) {
         console.log(`Error in create entity ${err}`)
+        return res.status(500).send({
+            message:"Something went wrong. Please try again or contact support"
+        })
     }
 }
 
