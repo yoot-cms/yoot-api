@@ -16,6 +16,9 @@ export type Permission = {
 export const Types = ["text", "number", "boolean", "image"]
 
 export function entity_data_is_valid(fields: string[], types: string[]) {
+    if(fields.length===0 || types.length===0) return {
+        status: false, message: "An entity can not have an empty schema"
+    }
     if (
         (new Set(fields)).size !== fields.length
     ) return {
