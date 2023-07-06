@@ -24,8 +24,8 @@ export function entity_data_is_valid(fields: string[], types: string[]) {
     ) return {
         status: false, message: "An entity can not have two fields of the same name"
     }
-    const invalid_type = types.find(field_type => Types.includes(field_type))
-    if (typeof invalid_type === "string") return {
+    const invalid_type = types.find(field_type => !Types.includes(field_type))
+    if (invalid_type) return {
         status: false, message: `Invalid or unsupported type ${invalid_type}`
     }
     return {
