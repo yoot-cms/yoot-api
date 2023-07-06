@@ -34,7 +34,10 @@ export async function create_entity( req: Request<{}, {}, { name:string, schema:
         const types = Object.values(schema)
         const { status, message } = entity_data_is_valid( fields, types )
         if(!status) return res.status(400).send({ message })
-        await sql` insert into entity(name, project, schema) values( ${name}, ${project}, ${JSON.stringify(schema)} ) `
+        await sql` 
+            insert into entity(name, project, schema) 
+            values( ${name}, ${project}, ${JSON.stringify(schema)} ) 
+        `
         return res.status(201).send({
             message:"Entity created successfuly"
         })
