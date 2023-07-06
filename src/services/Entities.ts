@@ -19,8 +19,8 @@ export async function get_entities(req: Request<{}, {}, { key: ApiKey }>, res: R
 export async function create_entity( req: Request<{}, {}, { name:string, schema:Record<string, string>, key: ApiKey }>, res: Response ){
     try {
         const { key:{ permissions, project }, name, schema } = req.body
-        if(!name || !schema) return res.status(400).send({
-            message:"name and schema are required"
+        if(!name || !schema || name==="" || typeof schema!=="object") return res.status(400).send({
+            message:"Bad request. See Yoot documentation for more details about how to create an entity"
         })
         const parsed_permissions = JSON.parse(permissions) as Permission
         if(!parsed_permissions.create_permission) return res.status(403).send({
