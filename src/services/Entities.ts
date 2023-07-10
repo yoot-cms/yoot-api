@@ -48,12 +48,30 @@ export async function create_entity( req: Request<{}, {}, { name:string, schema:
     }
 }
 
+export async function update_entity( req:Request<{name : string}, {}, {NewName:string, key:ApiKey}>, res:Response){
+    try {
+        const {key:{project, permissions}, NewName} = req.body
+        const {name} = req.params
+        const parsed_permissions = JSON.parse(permissions) as Permission
+        if (!parsed_permissions.write_permission) return res.status(403).send({
+            message : "Key does not have permission to update entities"
+        })
+        await sql ` update entity set name = ${NewName} 
+        where name = ${name} and project = ${project}`
+        return res.status(200).send({
+            message: "update successfully",
+        })
+    } catch (err) {
+        console.log(`Error in delete entity ${err}`)
+        return res.status(500).send()
+    }
+}
+
 export async function delete_entity( req: Request<{ name: string }, {trash? : boolean}, { key: ApiKey }>, res: Response ){
     try {
-        const { project } = req.body.key
+        const {key:{project,permissions}  } = req.body
         const { name } = req.params
         const {trash} = req.query
-        const {permissions} = req.body.key
         if (trash === 'true') {
             await sql `UPDATE entity SET trashed = true WHERE name = ${name} and project = ${project}`
             return res.status(200).send({
