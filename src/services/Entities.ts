@@ -62,7 +62,7 @@ export async function update_entity( req:Request<{name : string}, {}, {NewName:s
             message: "update successfully",
         })
     } catch (err) {
-        console.log(`Error in delete entity ${err}`)
+        console.log(`Error in update entity ${err}`)
         return res.status(500).send()
     }
 }
