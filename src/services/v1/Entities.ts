@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import sql from "../db";
-import { ApiKey, Permission, entity_data_is_valid } from "../utils";
+import sql from "../../db";
+import { ApiKey, Permission, entity_data_is_valid } from "../../utils";
 
 export async function get_entities(req: Request<{}, {}, { key: ApiKey }>, res: Response) {
     try {

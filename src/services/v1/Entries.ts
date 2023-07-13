@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import sql from "../db";
-import { ApiKey, Permission } from "../utils";
+import sql from "../../db";
+import { ApiKey, Permission } from "../../utils";
 
 export async function get_entries( req: Request<{}, {}, { key: ApiKey }>, res: Response ){
     try {
