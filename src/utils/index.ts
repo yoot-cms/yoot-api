@@ -16,7 +16,7 @@ export type Permission = {
 export const Types = ["text", "number", "boolean", "image"]
 
 export function entity_data_is_valid(fields: string[], types: string[]) {
-    if(fields.length===0 || types.length===0) return {
+    if (fields.length === 0 || types.length === 0) return {
         status: false, message: "An entity can not have an empty schema"
     }
     if (
@@ -31,4 +31,9 @@ export function entity_data_is_valid(fields: string[], types: string[]) {
     return {
         status: true, message: ""
     }
+}
+
+export function is_base_64(data: string) {
+    const base64Regex = /^data:[a-z-]+\/[a-z-]+;base64,/;
+    return base64Regex.test(data);
 }
