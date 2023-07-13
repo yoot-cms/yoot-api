@@ -8,7 +8,7 @@ import entities_v1 from "./routes/v1/entities"
 import entries_v1 from "./routes/v1/entries"
 const app = express()
 app.use(cors())
-app.use(express.json())
+app.use(express.json({ limit:"10mb" }))
 
 const PORT = process.env.PORT || 5000
 

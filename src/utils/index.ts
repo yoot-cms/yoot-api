@@ -13,7 +13,7 @@ export type Permission = {
     delete_permission: boolean
 }
 
-export const Types = ["text", "number", "boolean", "image"]
+export const Types = ["Text", "Number", "Boolean", "Image"]
 
 export function entity_data_is_valid(fields: string[], types: string[]) {
     if (fields.length === 0 || types.length === 0) return {
