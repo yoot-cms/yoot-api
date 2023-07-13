@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import sql from "../../db";
 import { ApiKey, Permission, entity_data_is_valid } from "../../utils";
+import { generic_error_message, generic_server_error_message } from "../../Config";
 
 export async function get_entities(req: Request<{}, {}, { key: ApiKey }>, res: Response) {
     try {
@@ -19,7 +20,7 @@ export async function create_entity( req: Request<{}, {}, { name:string, schema:
     try {
         const { key:{ permissions, project }, name, schema } = req.body
         if(!name || !schema || name==="" || typeof schema!=="object") return res.status(400).send({
-            message:"Bad request. See Yoot documentation for more details about how to create an entity"
+            message:generic_error_message
         })
         const parsed_permissions = JSON.parse(permissions) as Permission
         if(!parsed_permissions.create_permission) return res.status(403).send({
@@ -38,57 +39,73 @@ export async function create_entity( req: Request<{}, {}, { name:string, schema:
             values( ${name}, ${project}, ${JSON.stringify(schema)} ) 
         `
         return res.status(201).send({
-            message:"Entity created successfuly"
+            message:"Entity created"
         })
     } catch (err) {
         console.log(`Error in create entity ${err}`)
         return res.status(500).send({
-            message:"Something went wrong. Please try again or contact support"
+            message:generic_server_error_message
         })
     }
 }
 
-export async function update_entity( req:Request<{name : string}, {}, {NewName:string, key:ApiKey}>, res:Response){
+export async function update_entity( req:Request<{name : string}, {}, { name:string, key:ApiKey}>, res:Response){
     try {
-        const {key:{project, permissions}, NewName} = req.body
-        const {name} = req.params
+        const { key:{ project, permissions } } = req.body
+        if(!req.body.name) return res.status(400).send({
+            message:generic_error_message
+        })
+        const { name } = req.params
         const parsed_permissions = JSON.parse(permissions) as Permission
         if (!parsed_permissions.write_permission) return res.status(403).send({
             message : "Key does not have permission to update entities"
         })
-        await sql ` update entity set name = ${NewName} 
+        await sql ` update entity set name = ${req.body.name} 
         where name = ${name} and project = ${project}`
         return res.status(200).send({
-            message: "update successfully",
+            message: "Entity updated",
         })
     } catch (err) {
         console.log(`Error in update entity ${err}`)
-        return res.status(500).send()
+        return res.status(500).send({
+            message:generic_server_error_message
+        })
     }
 }
 
 export async function delete_entity( req: Request<{ name: string }, {trash? : boolean}, { key: ApiKey }>, res: Response ){
     try {
-        const {key:{project,permissions}  } = req.body
+        const { key: { project, permissions }  } = req.body
         const { name } = req.params
-        const {trash} = req.query
+        if(!name) return res.status(400).send({
+            message:generic_error_message
+        })
+        const [entity] = await sql<{id:string}[]>`select id from entity where name=${name} and project=${project}`
+        if(!entity) return res.status(404).send({
+            message:"Entity not found"
+        })
+        const { trash } = req.query
         if (trash === 'true') {
-            await sql `UPDATE entity SET trashed = true WHERE name = ${name} and project = ${project}`
+            await sql `UPDATE entity SET trashed = true WHERE id=${entity.id}`
             return res.status(200).send({
-                message : "Entity trashed successfuly"
+                message : "Entity trashed"
             })
         }
         const parsed_permissions = JSON.parse(permissions) as Permission
         if (!parsed_permissions.delete_permission) return res.status(403).send({
             message:"Key does not have permission to delete entities"
         })
-        await sql`DELETE FROM entity
-        WHERE name = ${name} and project = ${project}`
+        await sql.begin(sql => [
+            sql` delete from entry where entity=${entity.id} `,
+            sql` delete from entity where id=${entity.id}`
+        ])
         return res.status(200).send({
-            message: "Deleted successfully",
+            message: "Entity and related Entries deleted",
         })
     } catch (err) {
         console.log(`Error in delete entity ${err}`)
-        return res.status(500).send()
+        return res.status(500).send({
+            message:generic_server_error_message
+        })
     }
 }

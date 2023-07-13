@@ -4,14 +4,16 @@ import cors from "cors"
 import * as dotenv from "dotenv"
 dotenv.config()
 import sql from "./db"
-import entities_router from "./routes/entities"
+import entities_v1 from "./routes/v1/entities"
+import entries_v1 from "./routes/v1/entries"
 const app = express()
 app.use(cors())
 app.use(express.json())
 
 const PORT = process.env.PORT || 5000
 
-app.use(entities_router)
+app.use(entities_v1)
+app.use(entries_v1)
 
 app.get("/health", async (_req: Request, res: Response) => {
     try {
