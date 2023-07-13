@@ -3,6 +3,17 @@ import { generic_server_error_message } from "../../Config";
 import sql from "../../db";
 import { ApiKey } from "../../utils";
 
+export async function create_entry( req: Request, res: Response ){
+    try {
+
+    } catch (err) {
+        console.log(`Error in create entry ${err}`)
+        return res.status(500).send({
+            message:"Something went wrong. Please try again or contact support"
+        })
+    }
+}
+
 export async function get_entries( req: Request<{ entity_name: string }, {}, { key: ApiKey }>, res: Response ){
     try {
         const { project } = req.body.key
@@ -23,13 +34,7 @@ export async function get_entries( req: Request<{ entity_name: string }, {}, { k
     }
 }
 
-export async function create_entry( req: Request, res: Response ){
-    try {
-        
-    } catch (err) {
-        console.log(`Error in create entry ${err}`)
-        return res.status(500).send({
-            message:"Something went wrong. Please try again or contact support"
-        })
-    }
-}
+export async function update_entry(){}
+
+export async function delete_entry(){}
+
