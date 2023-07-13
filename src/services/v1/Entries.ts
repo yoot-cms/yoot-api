@@ -69,7 +69,7 @@ export async function create_entry(req: Request<{ entity_name: string }, {}, { k
                 }
             })
         )
-        await sql`insert into entry(entity, value) values( ${entity.id}, ${JSON.stringify(entry_value)} )`
+        await sql`insert into entry(entity, value) values( ${entity.id}, ${sql.json(entry_value)} )`
         return res.status(201).send()
     } catch (err) {
         console.log(`Error in create entry ${err}`)
