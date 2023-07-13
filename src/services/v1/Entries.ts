@@ -4,9 +4,9 @@ import sql from "../../db";
 import { ApiKey, Permission, is_base_64 } from "../../utils";
 import ImageKit from "imagekit";
 const imagekit = new ImageKit({
-    publicKey:process.env.IMAGEKIT_PUBLIC_KEY as string,
-    privateKey:process.env.IMAGEKIT_PRIVATE_KEY as string,
-    urlEndpoint:process.env.IMAGEKIT_URL_ENDPOINT as string
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY as string,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY as string,
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT as string
 })
 
 export async function create_entry(req: Request<{ entity_name: string }, {}, { key: ApiKey, value: Record<string, string | number | boolean> }>, res: Response) {
@@ -27,13 +27,19 @@ export async function create_entry(req: Request<{ entity_name: string }, {}, { k
         if (!entity) return res.status(404).send({
             message: "Entity not found"
         })
-        if (Object.keys(value).length !== Object.keys(entity.schema).length) return res.status(400).send({
+        const valid_number_of_field = Object.keys(value).length === Object.keys(entity.schema).length
+        const keys_match_schema = Object.keys(value).every(field => Object.keys(entity.schema).includes(field))
+        if (
+            !(
+                valid_number_of_field && keys_match_schema
+            )
+        ) return res.status(400).send({
             message: "Bad entry value. Make sure all the fields are set corresponding to the Entity's schema"
         })
         let entry_value: Record<string, string | number | boolean> = {}
         const fields = Object.entries(entity.schema)
         await Promise.all(
-            fields.map( async ([field_name, field_type]) => {
+            fields.map(async ([field_name, field_type]) => {
                 const data = value[field_name]
                 if (field_type === "Text") {
                     if (typeof data !== "string") return res.status(400).send({
@@ -57,13 +63,13 @@ export async function create_entry(req: Request<{ entity_name: string }, {}, { k
                     if (typeof data !== "string") return res.status(400).send({
                         message: `Field ${field_name} must be a base64 encoded string`
                     })
-                    if(!is_base_64(data as string)) return res.status(400).send({
+                    if (!is_base_64(data as string)) return res.status(400).send({
                         message: `Field ${field_name} must be a base64 encoded string`
                     })
                     const media_id = crypto.randomUUID()
                     const { url } = await imagekit.upload({
                         file: data as string,
-                        fileName:media_id
+                        fileName: media_id
                     })
                     entry_value[field_name] = url
                 }
@@ -102,7 +108,16 @@ export async function get_entries(req: Request<{ entity_name: string }, {}, { ke
     }
 }
 
-export async function update_entry() { }
+export async function update_entry(req: Request<{ entity_name: string, entry_id: string }, {}, { key: ApiKey, value: Record<string, string | number | boolean> }>, res: Response) {
+    try {
+
+    } catch (err) {
+        console.log(`Error in update entry ${err}`)
+        return res.status(500).send({
+            message: generic_server_error_message
+        })
+    }
+}
 
 export async function delete_entry(req: Request<{ entity_name: string, entry_id: string }, {}, { key: ApiKey }>, res: Response) {
     try {
