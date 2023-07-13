@@ -56,15 +56,20 @@ export async function update_entity( req:Request<{name : string}, {}, { name:str
             message:generic_error_message
         })
         const { name } = req.params
+        const [entity] = await sql<{id:string}[]>` select id from entity where name=${name} and project=${project} `
+        if(!entity) return res.status(404).send({
+            message:"Entity not found"
+        })
+        const [potential_duplicate] = await sql` select name from entity where project=${project} `
+        if(potential_duplicate) return res.status(409).send({
+            message:`An entity named ${req.body.name} already exists in this project`
+        })
         const parsed_permissions = JSON.parse(permissions) as Permission
         if (!parsed_permissions.write_permission) return res.status(403).send({
             message : "Key does not have permission to update entities"
         })
-        await sql ` update entity set name = ${req.body.name} 
-        where name = ${name} and project = ${project}`
-        return res.status(200).send({
-            message: "Entity updated",
-        })
+        await sql `update entity set name=${req.body.name} where id=${entity.id}`
+        return res.status(200).send()
     } catch (err) {
         console.log(`Error in update entity ${err}`)
         return res.status(500).send({
