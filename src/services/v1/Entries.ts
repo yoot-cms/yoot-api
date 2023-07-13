@@ -13,15 +13,15 @@ export async function create_entry(req: Request<{ entity_name: string }, {}, { k
     try {
         const { entity_name } = req.params
         const { key: { permissions, project }, value } = req.body
+        const parsed_permissions = JSON.parse(permissions) as Permission
+        if (!parsed_permissions.create_permission) return res.status(403).send({
+            message: "Key does not have permission to create entries"
+        })
         if (!entity_name) return res.status(400).send({
             message: generic_error_message
         })
         if (!value || typeof value !== "object") return res.status(400).send({
             message: generic_error_message
-        })
-        const parsed_permissions = JSON.parse(permissions) as Permission
-        if (!parsed_permissions.create_permission) return res.status(403).send({
-            message: "Key does not have permission to create entries"
         })
         const [entity] = await sql<{ id: string, project: string, schema: Record<string, "Text" | "Number" | "Boolean" | "Image"> }[]>`select * from entity where name=${entity_name} and project=${project}`
         if (!entity) return res.status(404).send({
@@ -110,7 +110,18 @@ export async function get_entries(req: Request<{ entity_name: string }, {}, { ke
 
 export async function update_entry(req: Request<{ entity_name: string, entry_id: string }, {}, { key: ApiKey, value: Record<string, string | number | boolean> }>, res: Response) {
     try {
-
+        const { key:{ permissions, project }, value} = req.body
+        const { entry_id, entity_name } = req.params
+        const parsed_permissions = JSON.parse(permissions) as Permission
+        if(!parsed_permissions.write_permission) return res.status(403).send({
+            message:"Key does not have the permissions to edit entries"
+        })
+        if(!entity_name || !entity_name) return res.status(400).send({
+            message:generic_error_message
+        })
+        if(!value || typeof value!=="object") return res.status(400).send({
+            message:generic_error_message
+        })
     } catch (err) {
         console.log(`Error in update entry ${err}`)
         return res.status(500).send({
