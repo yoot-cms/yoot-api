@@ -81,7 +81,7 @@ export async function delete_entity( req: Request<{ name: string }, {trash? : bo
         const { key: { project, permissions }  } = req.body
         const { name } = req.params
         const parsed_permissions = JSON.parse(permissions) as Permission
-        if (!parsed_permissions.delete_permission) return res.status(403).send({
+        if ( !parsed_permissions.delete_permission ) return res.status(403).send({
             message:"Key does not have permission to delete entities"
         })
         if(!name) return res.status(400).send({

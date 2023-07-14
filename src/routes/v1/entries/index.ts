@@ -10,6 +10,6 @@ entries_v1.route("/v1/entities/:entity_name/entries").post( authenticate_request
 
 entries_v1.route("/v1/entities/:entity_name/entries/:entry_id").delete( authenticate_request, delete_entry )
 
-entries_v1.route("/v1/entities/:entity_name/entries/:entry_id").patch( authenticate_request, update_entry )
+entries_v1.route("/v1/entities/:entity_name/entries/:entry_id").put( authenticate_request, update_entry )
 
 export default entries_v1
