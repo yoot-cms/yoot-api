@@ -209,3 +209,28 @@ export async function delete_entry(req: Request<{ entity_name: string, entry_id:
         })
     }
 }
+
+export async function get_entries_trashed( req: Request<{name : string},{}, { key: ApiKey }>, res: Response ){
+    try {
+        const {project} = req.body.key
+        const {name} = req.params
+        if (!name) return res.status(400).send({
+            message : "entity don't exist"
+        })
+        const [trashed_entity] = await sql <{ id: string }[]>
+        `select id from entity
+         where trashed = true 
+         and project = ${project} 
+         and name = ${name}`
+        if (!trashed_entity) return res.status(404).send({
+            message : 'entity not found'
+        })
+        const entries = await sql `select * from entry where entity = ${trashed_entity.id}`
+        return res.status(200).send({
+            entries
+        })        
+    } catch (err) {
+        console.log(`${err}`)
+        return res.status(500).send()
+    }   
+}

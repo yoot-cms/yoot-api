@@ -6,6 +6,7 @@ dotenv.config()
 import sql from "./db"
 import entities_v1 from "./routes/v1/entities"
 import entries_v1 from "./routes/v1/entries"
+import projects_v1 from "./routes/v1/projects"
 const app = express()
 app.use(cors())
 app.use(express.json({ limit:"10mb" }))
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 5000
 
 app.use(entities_v1)
 app.use(entries_v1)
+app.use(projects_v1)
 
 app.get("/health", async (_req: Request, res: Response) => {
     try {

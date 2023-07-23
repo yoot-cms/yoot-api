@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { authenticate_request } from "../../../middlewares/Auth";
-import { get_entries, create_entry, delete_entry, update_entry } from "../../../services/v1/Entries";
+import { get_entries, create_entry, delete_entry, update_entry, get_entries_trashed } from "../../../services/v1/Entries";
 
 const entries_v1 = Router()
 
 entries_v1.route("/v1/entities/:entity_name/entries").get( authenticate_request, get_entries )
+
+entries_v1.route("/v1/entities/:name/entries").get( authenticate_request, get_entries_trashed )
 
 entries_v1.route("/v1/entities/:entity_name/entries").post( authenticate_request, create_entry )
 
