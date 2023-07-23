@@ -17,6 +17,14 @@ app.use(entities_v1)
 app.use(entries_v1)
 app.use(projects_v1)
 
+app.get("/is_up", (_req:Request, res:Response)=>{
+  try {
+    return res.status(200).send()
+  } catch (err) {
+    return res.status(500).send()
+  }
+})
+
 app.get("/health", async (_req: Request, res: Response) => {
     try {
         const db_version = await sql` select version() `
